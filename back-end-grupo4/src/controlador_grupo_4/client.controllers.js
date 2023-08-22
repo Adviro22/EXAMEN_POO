@@ -9,14 +9,21 @@ export const getClients = async (req, res) => {
 
 export const createClient = async (req, res) => {
   try {
-    // name, ruc, direction, type_client
-     const { name,ruc,direction,type_client } = req.body;
-    // Verificar si ya existe un usuario con el mismo correo electrónico
+    const { name, ruc, direction, type_client } = req.body;
+
+    // Validar el formato del RUC utilizando una expresión regular
+    const rucRegex = /^[0-9]{13}$/;
+    if (!rucRegex.test(ruc)) {
+      return res.status(400).json({ message: 'El formato del RUC no es válido' });
+    }
+
+    // Verificar si ya existe un registro con el mismo RUC
     const existingEst = await Client.findOne({ ruc });
     if (existingEst) {
-      return res.status(400).json({ message: 'Ya existe un registro con el mismo ruc' });
+      return res.status(400).json({ message: 'Ya existe un registro con el mismo RUC' });
     }
-    console.log(req.body)
+
+    // Crear el nuevo cliente
     const client = new Client({
       name,
       ruc,
@@ -24,16 +31,20 @@ export const createClient = async (req, res) => {
       type_client,
       user: req.user.userId
     });
-    console.log(client)
-    const clientOk= await client.save();
+
+    // Guardar el cliente en la base de datos
+    const clientOk = await client.save();
 
     // Enviar una respuesta al cliente
-    res.status(200).json({"status":"registro ingresado ok",clientOk});
+    res.status(200).json({ status: 'Registro ingresado correctamente', clientOk });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error al insertar" });
+    res.status(500).json({ message: 'Error al insertar el registro' });
   }
 };
+
+
+
 
 export const deleteClient = async (req, res) => {
   try {

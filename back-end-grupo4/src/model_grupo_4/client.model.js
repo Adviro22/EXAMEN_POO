@@ -4,7 +4,7 @@ const clientSchema = new mongoose.Schema({
   name:{ type:String, required: true},
   ruc: {type: Number, required: true, unique: true},
   direction: { type: String, required: true },
-  type_client: { type: String, required: true },
+  type_client: { type: String, default: "I" },
   user: {type: mongoose.Types.ObjectId, ref: "User"},
   },
   {timestamps:true},
